@@ -1,0 +1,60 @@
+schema_version: 1
+
+context:
+  name: word-image
+  version: "0.1.3"
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/word_image-${{ version }}.tar.gz
+  sha256: 2f9434684134860e1feb7378881be86982e1722d9bb304babec30efe9ad6c89f
+
+build:
+  number: 2
+  script: ${{ PYTHON }} -m pip install . -vv
+  skip:
+    - match(python, ">=3.13")
+
+requirements:
+  build:
+    - ${{ compiler('c') }}
+    - ${{ stdlib('c') }}
+    - if: linux
+      then: xorg-libxfixes
+  host:
+    - pip
+    - python
+    - setuptools
+    - if: linux
+      then: libgl-devel
+  run:
+    - imgaug
+    - matplotlib-base
+    - numpy <2
+    - pillow
+    - python
+    - imagecodecs <2026
+
+tests:
+  - python:
+      imports:
+        - word_image
+  - requirements:
+      run:
+        - pip
+    script:
+      - pip check
+
+about:
+  summary: Generate images of words with configurable augmentation options
+  license: MIT
+  license_file:
+    - LICENSE
+  homepage: https://github.com/econser/word_image
+
+extra:
+  recipe-maintainers:
+    - econser
